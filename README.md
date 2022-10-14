@@ -72,10 +72,15 @@ Before you start the deployment of Container Security into EKS Cluster, first, l
 
 ![Rulesets](images/rulesets.png)
 4. Set the `(T1059.004)Update Package Repository` rule to `Terminate`.
+
 5. Set the `(T1053.003)Schedule Cron Jobs` rule to `Isolate`.
+
 6. Click `Save` and go to `Policies`.
+
 7. Click `+ Add` and pick a name and description for the policy.
+
 8. On `Runtime` tab, click `+ Add Ruleset` button and add our newly created ruleset configuration.
+
 9. Save changes and proceed to the cluster deployment.
 
 Here we have two options to help you deploy your Container Security application within your newly created cluster.
