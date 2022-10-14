@@ -71,6 +71,7 @@ Before you start the deployment of Container Security into EKS Cluster, first, l
 3. Optionally, if you want to show the granularity of Container Security, you can set label field to `key = app` and `value = java-goof` as we can see below:
 
 ![Rulesets](images/rulesets.png)
+
 4. Set the `(T1059.004)Update Package Repository` rule to `Terminate`.
 
 5. Set the `(T1053.003)Schedule Cron Jobs` rule to `Isolate`.
@@ -117,9 +118,11 @@ We want to be able to showcase how easy and simple it is to deploy Container Sec
 7. Filter by CVE and search for CVE ID `CVE-2017-5638`, you will see some vulnerable packages related to this vulnerability as below:
 
 ![CVE-2017-5638](images/cve-2017-5638.PNG)
+
 8. To check if our app is up and running, run `kubectl get svc -n java-goof` and copy the `EXTERNAL IP` address and paste in your browser.
 
 ![EXTERNAL IP](images/get-svc-goof.PNG)
+
 9. It may take up to 5 minutos to see the Todolist MVC web page.
 
 ![TODOLIST](images/todolist-webpage.PNG)
@@ -136,6 +139,7 @@ We'll show on this phase how we can exploit it using another container running i
 4. You can open a new terminal window to check your pod by running `kubectl get pods -n attacker` as below:
 
 ![Attacker](images/attacker.PNG)
+
 5. When executed, you'll jump straight to the attacker container, run `cd /home/` to finde our exploit file which will be used to exploit our java-goof app.
 6. To simplify our test, let's save our todolist web address into our container's memory by running `export URL="<EXTERNAL-IP>"`.
 7. Remember to replace the value of `<EXTERNAL-IP>` by the value you've got from the step 8 on Phase 1.
@@ -146,10 +150,12 @@ Phase 3: Triggering Runtime Security Events with Terminate Action
 1. Run `python3 exploit-python3.py $URL "ls"` to list the files from our java-goof container as below:
 
 ![ls](images/ls.PNG)
+
 2. Run `python3 exploit-python3.py $URL "echo >> teste.txt"` to use the exploit to create a file inside the java-goof directory.
 3. Run `python3 exploit-python3.py $URL "ls"` again to see the newly `test.txt` created as below.
 
 ![Test](images/test.PNG)
+
 4. Now, let's see how Runtime Security with Terminate mitigation action can help as a security control for your clusters.
 5. Run `python3 exploit-python3.py $URL "touch /etc/apt/testfile"` command and wait for the logs appear on Container Security Runtime Events.
 6. Container Security will terminate the container and Kubernetes Scheduler, will spin up a new one from the scratch.
@@ -163,12 +169,14 @@ Phase 4: Triggering Runtime Security Events with Isolate Action
 3. If you have deployed Calico correctly, from your cluster terminal (not the attacker) you can run `kubectl get networkpolicy -A` to see all the network policies as below:
 
 ![Network Policies](images/network-policy.PNG)
+
 4. From your attacker container terminal, run `python3 exploit-python3.py $URL "touch /etc/cron.daily/testfile"` to trigger the isolation action.
 5. The mitigation action takes up to 5 minutes to isolate the pod.
 6. Once you see the logs on your Container Security Runtime Events, back to the cluster terminal and run `kubectl get networkpolicy -A` again.
 7. You'll see there's a new NetworkPolicy created and your web app isn't reachable anymore.
 
 ![Isolate Policies](images/isolate-policy.PNG)
+
 8. Container Security automatically create the network isolation policy, and applies it to your container by adding a label to your pod as the target for the policy.  
 9. You can run `kubectl describe pod java-goof -n java-goof` to check the new label and `kubectl describe networkpolicy trendmicro-oversight-isolate-policy -n java-goof` to check the policy.
 
