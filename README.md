@@ -183,26 +183,13 @@ Phase 4: Triggering Runtime Security Events with Isolate Action
 ![Isolate Policies](images/isolate-policy.PNG)
 
 ![Pod Isolate](images/pod-isolate.PNG)
+
 10. Once you delete the isolation network policy, your application will be reachable again.
 
 # Attacking with CloudShell
 If you want to show an attack from outside of your Kubernetes cluster, you can upload the `exploit-python3.py` file into CloudShell an execute the same commands we did on phase 3 and 4.
 
-## Limitations
-
-As you read at least a few hundred times, this is in preview, so limitations are expected. A few of them are:
-
-* Some vulnerabilities might not show a Description, showing a placeholder text instead.
-* Some vulnerabilities, despite having known fix available, might show up as not having a fix available
-* If a new deployment is made without fixing a digest, and Container Security is already deployed to that cluster, to achieve speedier scans, you might not see a digest information on vulnerability detections for this container, seeing a placeholder "N/A" instead. This won't happen if container is already running when Container Security is deployed or a digest is fixed when deploying a container.  
-* Perform helm uninstall and helm install when updating the helm chart for a new cluster. Do not helm upgrade, it will not work.
-* Wait until the admission-controller is 1/1 running (from kubectl get pods -A) (it may take 30-40s after helm install) before deploying a pod into the cluster. Otherwise, the pod will not be scanned.
-* Try not to deploy deployments/replica-sets because the deployment/replica-set itself will also be scanned. Deploy only pods instead.
-* Aim to deploy pods with less than 1000 total vulnerabilities, hard cap 1500 vulnerabilities. Otherwise, deleting the pod will take longer and also risk timing out.
-* New vulnerabilities will not appear for at least 30 seconds (probably closer to around a minute) after a pod has been deployed. So don't try to refresh too quickly.
-* Images must be hosted in public registries, like Docker Hub.
-
-## How to Clean the environment
+# How to Clean the environment
 
 You are not made of money. Delete all deployments/pods created during the demo. If you built the EKS cluster using the deployment script, run the `stop-cluster.sh` script so the cluster can be deleted whenever you are done for session/day. I heard no one is going to expense your environment if you forget to delete the cluster 👀
 
