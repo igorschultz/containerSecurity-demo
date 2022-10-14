@@ -132,7 +132,6 @@ Phase 2: Setting Up the Environment to Trigger Runtime Security
 Now it's time to test the impact this vulnerability brings to our environment and how dangerous it is to our cluster. This is a critical vulnerability which allows attacker to gain access to the host and take control of your host/container executing arbitrary commands inside our java-goof pod.
 We'll show on this phase how we can exploit it using another container running inside the same host or via CloudShell. We'll use this vulnerability to list files from the java-goof container, create a file, and trigger those rules we've set during ruleset creation to show how the termination and isolation remediate actions works on the cluster.
 
-
 1. Let's create a new namespace for the attacker container by running `kubectl create namespace attacker`.
 2. You can see the new namespace by running `kubectl get namespaces`.
 3. Create the attacker container with the command `kubectl run attacker --rm -i --tty --image igorschul/attacker -n attacker`.
@@ -187,7 +186,10 @@ Phase 4: Triggering Runtime Security Events with Isolate Action
 10. Once you delete the isolation network policy, your application will be reachable again.
 
 # Attacking with CloudShell
+
 If you want to show an attack from outside of your Kubernetes cluster, you can upload the `exploit-python3.py` file into CloudShell an execute the same commands we did on phase 3 and 4.
+It's intended to be used for demos and educational purposes, do not use it in real scenarios!!!
+
 
 # How to Clean the environment
 
