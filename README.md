@@ -64,7 +64,7 @@ helm version
 
 ## How to Deploy It
 
-Before you start the deployment of Container Security into EKS Cluster, first, let's create a specific policy for this demo;
+Before you start the deployment of Container Security into EKS Cluster, first, let's create a specific policy for this demo:
 
 1. Go to `runtime ruleset` page, click the `+ Add` button.
 2. Give it a name and a description.
@@ -72,7 +72,7 @@ Before you start the deployment of Container Security into EKS Cluster, first, l
 ![Rulesets](images/rulesets.png)
 4. Set the `(T1059.004)Update Package Repository` rule to `Terminate`.
 5. Set the `(T1053.003)Schedule Cron Jobs` rule to `Isolate`.
-6. Click `Save`and go to `Policies`.
+6. Click `Save` and go to `Policies`.
 7. Click `+ Add` and pick a name and description for the policy.
 8. On `Runtime` tab, click `+ Add Ruleset` button and add our newly created ruleset configuration.
 9. Save changes and proceed to the cluster deployment.
@@ -91,7 +91,7 @@ Having problems with the script or you have no ❤️ towards MacOS or Linux? No
 1. Login to <https://cloudone.trendmicro.com/>
 2. Go to Container Security
 3. In the Clusters page, click the `+ Add` button.
-4. Pick a name and description for the cluster. Select your previously created policy and make sure to check the **enabled** checkbox under Runtime Security and Runtime Scanning.
+4. Pick a name and description for your cluster. Select your previously created policy and make sure to check the **enabled** checkbox under **Runtime Security** and **Runtime Scanning**.
 5. In the next window, copy the overrides file generated for you.
 6. Make sure the indentation is correct!
 7. Run the command provided by the dashboard to enroll the cluster, right below the overrides file content.
@@ -99,6 +99,7 @@ Having problems with the script or you have no ❤️ towards MacOS or Linux? No
 ## How to Demo it
 
 Phase 1: Runtime Scanning
+
 We want to be able to showcase how easy and simple it is to deploy Container Security and get insightful and actionable information about vulnerabilities in running containers in matter of minutes, if not seconds.
 
 1. Show the empty Vulnerability View page.
@@ -109,12 +110,13 @@ We want to be able to showcase how easy and simple it is to deploy Container Sec
 6. Back to your Container Security console and go to `Vulnerability View page`, now you might have some detections on this page.
 7. Filter by CVE and search for CVE ID `CVE-2017-5638`, you will see some vulnerable packages related to this vulnerability as below:
 ![CVE-2017-5638](images/cve-2017-5638.PNG)
-8. To check if our app is up and running, run `kubectl get svc -n java-goof` and copy the `EXTERNAL IP` address and paste in our browser.
+8. To check if our app is up and running, run `kubectl get svc -n java-goof` and copy the `EXTERNAL IP` address and paste in your browser.
 ![EXTERNAL IP](images/get-svc-goof.PNG)
 9. It may take up to 5 minutos to see the Todolist MVC web page.
 ![TODOLIST](images/todolist-webpage.PNG)
 
 Phase 2: Setting Up the Environment to Trigger Runtime Security
+
 Now it's time to test the impact this vulnerability brings to our environment and how dangerous it is to our cluster. This is a critical vulnerability which allows attacker to gain access to the host and take control of your host/container executing arbitrary commands inside our java-goof pod.
 We'll show on this phase how we can exploit it using another container running inside the same host or via CloudShell. We'll use this vulnerability to list files from the java-goof container, create a file, and trigger those rules we've set during ruleset creation to show how the termination and isolation remediate actions works on the cluster.
 
@@ -122,19 +124,21 @@ We'll show on this phase how we can exploit it using another container running i
 1. Let's create a new namespace for the attacker container by running `kubectl create namespace attacker`.
 2. You can see the new namespace by running `kubectl get namespaces`.
 3. Create the attacker container with the command `kubectl run attacker --rm -i --tty --image igorschul/attacker -n attacker`.
-4. You can open a new terminal windows to check your pod by running `kubectl get pods -n attacker` as below:
+4. You can open a new terminal window to check your pod by running `kubectl get pods -n attacker` as below:
 ![Attacker](images/attacker.PNG)
 5. When executed, you'll jump straight to the attacker container, run `cd /home/` to finde our exploit file which will be used to exploit our java-goof app.
-6. To simplify our test, let's save our todolist web address into our containers memory by running `export URL="<EXTERNAL-IP>"`.
+6. To simplify our test, let's save our todolist web address into our container's memory by running `export URL="<EXTERNAL-IP>"`.
 7. Remember to replace the value of `<EXTERNAL-IP>` by the value you've got from the step 8 on Phase 1.
 8. Now, let's execute some attacks.
 
 Phase 3: Triggering Runtime Security Events with Terminate Action
 
 1. Run `python3 exploit-python3.py $URL "ls"` to list the files from our java-goof container as below:
+
 ![ls](images/ls.PNG)
 2. Run `python3 exploit-python3.py $URL "echo >> teste.txt"` to use the exploit to create a file inside the java-goof directory.
 3. Run `python3 exploit-python3.py $URL "ls"` again to see the newly `test.txt` created as below.
+
 ![Test](images/test.PNG)
 4. Now, let's see how Runtime Security with Terminate mitigation action can help as a security control for your clusters.
 5. Run `python3 exploit-python3.py $URL "touch /etc/apt/testfile"` command and wait for the logs appear on Container Security Runtime Events.
@@ -147,20 +151,24 @@ Phase 4: Triggering Runtime Security Events with Isolate Action
 1. To be able to trigger pod isolation, first you need to deploy a Kubernetes Network Plugin, such as Project Calico as mentioned here: <https://github.com/trendmicro/cloudone-container-security-helm>.
 2. If you haven't done that yet, please back to `Requirements` step 7.
 3. If you have deployed Calico correctly, from your cluster terminal (not the attacker) you can run `kubectl get networkpolicy -A` to see all the network policies as below:
+
 ![Network Policies](images/network-policy.PNG)
 4. From your attacker container terminal, run `python3 exploit-python3.py $URL "touch /etc/cron.daily/testfile"` to trigger the isolation action.
 5. The mitigation action takes up to 5 minutes to isolate the pod.
 6. Once you see the logs on your Container Security Runtime Events, back to the cluster terminal and run `kubectl get networkpolicy -A` again.
 7. You'll see there's a new NetworkPolicy created and your web app isn't reachable anymore.
+
 ![Isolate Policies](images/isolate-policy.PNG)
 8. Container Security automatically create the network isolation policy, and applies it to your container by adding a label to your pod as the target for the policy.  
 9. You can run `kubectl describe pod java-goof -n java-goof` to check the new label and `kubectl describe networkpolicy trendmicro-oversight-isolate-policy -n java-goof` to check the policy.
+
 ![Isolate Policies](images/isolate-policy.PNG)
+
 ![Pod Isolate](images/pod-isolate.PNG)
 10. Once you delete the isolation network policy, your application will be reachable again.
 
 # Attacking with CloudShell
-If you want to show an attack from outside your container, you can upload the `exploit-python3.py` file into CloudShell an execute the same commands we did on phase 3 and 4.
+If you want to show an attack from outside of your Kubernetes cluster, you can upload the `exploit-python3.py` file into CloudShell an execute the same commands we did on phase 3 and 4.
 
 ## Limitations
 
