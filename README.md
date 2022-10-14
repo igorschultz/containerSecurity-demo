@@ -69,6 +69,7 @@ Before you start the deployment of Container Security into EKS Cluster, first, l
 1. Go to `runtime ruleset` page, click the `+ Add` button.
 2. Give it a name and a description.
 3. Optionally, if you want to show the granularity of Container Security, you can set label field to `key = app` and `value = java-goof` as we can see below:
+
 ![Rulesets](images/rulesets.png)
 4. Set the `(T1059.004)Update Package Repository` rule to `Terminate`.
 5. Set the `(T1053.003)Schedule Cron Jobs` rule to `Isolate`.
@@ -109,10 +110,13 @@ We want to be able to showcase how easy and simple it is to deploy Container Sec
 5. Now, we can deploy our application by running `kubectl apply -f java-goof.yaml` command.
 6. Back to your Container Security console and go to `Vulnerability View page`, now you might have some detections on this page.
 7. Filter by CVE and search for CVE ID `CVE-2017-5638`, you will see some vulnerable packages related to this vulnerability as below:
+
 ![CVE-2017-5638](images/cve-2017-5638.PNG)
 8. To check if our app is up and running, run `kubectl get svc -n java-goof` and copy the `EXTERNAL IP` address and paste in your browser.
+
 ![EXTERNAL IP](images/get-svc-goof.PNG)
 9. It may take up to 5 minutos to see the Todolist MVC web page.
+
 ![TODOLIST](images/todolist-webpage.PNG)
 
 Phase 2: Setting Up the Environment to Trigger Runtime Security
@@ -125,6 +129,7 @@ We'll show on this phase how we can exploit it using another container running i
 2. You can see the new namespace by running `kubectl get namespaces`.
 3. Create the attacker container with the command `kubectl run attacker --rm -i --tty --image igorschul/attacker -n attacker`.
 4. You can open a new terminal window to check your pod by running `kubectl get pods -n attacker` as below:
+
 ![Attacker](images/attacker.PNG)
 5. When executed, you'll jump straight to the attacker container, run `cd /home/` to finde our exploit file which will be used to exploit our java-goof app.
 6. To simplify our test, let's save our todolist web address into our container's memory by running `export URL="<EXTERNAL-IP>"`.
