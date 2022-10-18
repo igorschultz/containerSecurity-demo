@@ -1,5 +1,5 @@
 cloudOne:
-    apiKey: 2G7oJbUUFB1LObpBCQDuFhsYT5y
+    apiKey: <YOUR-API-KEY>
     endpoint: https://container.us-1.cloudone.trendmicro.com
     runtimeSecurity:
         enabled: true
